@@ -1,0 +1,4 @@
+@model Book
+@{ ViewData["Title"] = "Add book"; }
+<h2>Register a book</h2>
+<form asp-action="Create" method="post"><partial name="_BookForm" model="Model" /></form>

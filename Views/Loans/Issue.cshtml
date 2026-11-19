@@ -1,0 +1,16 @@
+@model IssueVm
+@{ ViewData["Title"] = "Issue book"; }
+<div class="row"><div class="col-md-7">
+    <h2>Issue a book</h2>
+    <p class="text-muted">Rules: a student may hold 3 books at a time for 14 days. Students with overdue books or unpaid fines are blocked.</p>
+    <form asp-action="Issue" method="post">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <div class="mb-3"><label asp-for="UserId" class="form-label">Student</label>
+            <select asp-for="UserId" asp-items="(SelectList)ViewBag.Users" class="form-select"><option value="0">-- select student --</option></select>
+            <span asp-validation-for="UserId" class="text-danger"></span></div>
+        <div class="mb-3"><label asp-for="BookId" class="form-label">Book</label>
+            <select asp-for="BookId" asp-items="(SelectList)ViewBag.Books" class="form-select"><option value="0">-- select book --</option></select>
+            <span asp-validation-for="BookId" class="text-danger"></span></div>
+        <button class="btn btn-primary">Issue</button>
+    </form>
+</div></div>

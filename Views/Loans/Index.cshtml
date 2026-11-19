@@ -1,0 +1,59 @@
+@model List<Loan>
+@inject LibraryService Lib
+@{
+    ViewData["Title"] = "Loans";
+    var isDesk = User.IsInRole("Admin") || User.IsInRole("Staff");
+    var status = (string?)ViewBag.Status;
+}
+<div class="d-flex justify-content-between mb-3">
+    <h2>@(isDesk ? "All loans" : "My loans")</h2>
+    <div class="btn-group align-self-center">
+        <a class="btn btn-sm @(status == null ? "btn-dark" : "btn-outline-dark")" asp-action="Index">All</a>
+        <a class="btn btn-sm @(status == "active" ? "btn-dark" : "btn-outline-dark")" asp-action="Index" asp-route-status="active">Active</a>
+        <a class="btn btn-sm @(status == "overdue" ? "btn-dark" : "btn-outline-dark")" asp-action="Index" asp-route-status="overdue">Overdue</a>
+    </div>
+</div>
+<p class="text-muted">Fine rate: ₱@Lib.FinePerDay.ToString("N2") per overdue day.</p>
+<table class="table table-striped bg-white align-middle">
+    <thead><tr><th>Book</th>@if (isDesk) { <th>Member</th> }<th>Issued</th><th>Due</th><th>Returned</th><th>Status</th><th>Fine</th>@if (isDesk) { <th></th> }</tr></thead>
+    <tbody>
+    @foreach (var l in Model)
+    {
+        var fine = l.ReturnedOn == null ? Lib.Fine(l) : l.FineAmount;
+        <tr>
+            <td>@l.Book.Title</td>
+            @if (isDesk) { <td>@l.User.FullName</td> }
+            <td>@l.IssuedOn.ToString("MMM d, yyyy")</td>
+            <td>@l.DueOn.ToString("MMM d, yyyy")</td>
+            <td>@(l.ReturnedOn?.ToString("MMM d, yyyy") ?? "—")</td>
+            <td>
+                @if (l.ReturnedOn != null) { <span class="badge bg-secondary">Returned</span> }
+                else if (l.OverdueDays > 0) { <span class="badge bg-danger">Overdue @l.OverdueDays d</span> }
+                else { <span class="badge bg-primary">Active</span> }
+            </td>
+            <td>
+                @if (fine > 0)
+                {
+                    <span>₱@fine.ToString("N2")</span>
+                    @if (l.ReturnedOn != null) { <span class="badge @(l.FinePaid ? "bg-success" : "bg-warning text-dark")">@(l.FinePaid ? "Paid" : "Unpaid")</span> }
+                }
+                else { <span>—</span> }
+            </td>
+            @if (isDesk)
+            {
+                <td class="text-end">
+                    @if (l.ReturnedOn == null)
+                    {
+                        <form asp-action="Return" asp-route-id="@l.Id" method="post" class="d-inline"><button class="btn btn-sm btn-success">Return</button></form>
+                    }
+                    else if (fine > 0 && !l.FinePaid)
+                    {
+                        <form asp-action="PayFine" asp-route-id="@l.Id" method="post" class="d-inline"><button class="btn btn-sm btn-warning">Mark paid</button></form>
+                    }
+                </td>
+            }
+        </tr>
+    }
+    </tbody>
+</table>
+@if (!Model.Any()) { <p class="text-muted">No loans to show.</p> }

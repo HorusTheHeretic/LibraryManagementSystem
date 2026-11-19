@@ -1,0 +1,30 @@
+@model List<Loan>
+@inject LibraryService Lib
+@{
+    ViewData["Title"] = "Reports";
+    var start = (DateTime)ViewBag.Start; var end = (DateTime)ViewBag.End;
+    decimal Fine(Loan l) => l.ReturnedOn == null ? Lib.Fine(l) : l.FineAmount;
+    var totalFines = Model.Sum(l => Fine(l));
+}
+<h2>Activity report</h2>
+<form method="get" class="row g-2 mb-3">
+    <div class="col-auto"><input type="date" name="start" value="@start.ToString("yyyy-MM-dd")" class="form-control" /></div>
+    <div class="col-auto"><input type="date" name="end" value="@end.ToString("yyyy-MM-dd")" class="form-control" /></div>
+    <div class="col-auto"><button class="btn btn-secondary">Generate</button></div>
+</form>
+<div class="mb-3 d-flex flex-wrap gap-2">
+    <a class="btn btn-outline-success" asp-action="ExportCsv" asp-route-type="loans" asp-route-start="@start.ToString("yyyy-MM-dd")" asp-route-end="@end.ToString("yyyy-MM-dd")">⬇ Loan activity (this range)</a>
+    <a class="btn btn-outline-success" asp-action="ExportCsv" asp-route-type="overdue">⬇ Overdue books</a>
+    <a class="btn btn-outline-success" asp-action="ExportCsv" asp-route-type="fines">⬇ Fines</a>
+    <a class="btn btn-outline-success" asp-action="ExportCsv" asp-route-type="inventory">⬇ Inventory</a>
+</div>
+<p><strong>@Model.Count</strong> issued · <strong>@Model.Count(l => l.ReturnedOn != null)</strong> returned · <strong>@Model.Count(l => l.ReturnedOn == null)</strong> still out · fines <strong>₱@totalFines.ToString("N2")</strong></p>
+<table class="table table-striped bg-white">
+    <thead><tr><th>Issued</th><th>Book</th><th>Member</th><th>Due</th><th>Returned</th><th>Fine</th></tr></thead>
+    <tbody>
+    @foreach (var l in Model)
+    {
+        <tr><td>@l.IssuedOn.ToString("MMM d, yyyy")</td><td>@l.Book.Title</td><td>@l.User.FullName</td><td>@l.DueOn.ToString("MMM d, yyyy")</td><td>@(l.ReturnedOn?.ToString("MMM d, yyyy") ?? "—")</td><td>₱@Fine(l).ToString("N2")</td></tr>
+    }
+    </tbody>
+</table>

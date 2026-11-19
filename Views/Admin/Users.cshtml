@@ -1,0 +1,12 @@
+@model List<AppUser>
+@{ ViewData["Title"] = "Members"; }
+<div class="d-flex justify-content-between mb-3"><h2>Members</h2>@if (User.IsInRole("Admin")) { <a class="btn btn-primary align-self-center" asp-action="CreateUser">+ Add account</a> }</div>
+<table class="table table-striped bg-white">
+    <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Books on loan</th></tr></thead>
+    <tbody>
+    @foreach (var u in Model)
+    {
+        <tr><td>@u.FullName</td><td>@u.Email</td><td><span class="badge bg-secondary">@u.Role</span></td><td>@u.Loans.Count(l => l.ReturnedOn == null)</td></tr>
+    }
+    </tbody>
+</table>

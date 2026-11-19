@@ -1,0 +1,13 @@
+node_modules/
+.env
+.env.*
+!.env.example
+coverage/
+.DS_Store
+
+# .NET build output from the old ASP.NET source
+bin/
+obj/
+.vs/
+*.user
+*.suo
