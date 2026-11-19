@@ -10,7 +10,7 @@ Install these before opening the project:
 
 1. [Visual Studio Code](https://code.visualstudio.com/download) — the editor used to open this project.
 2. [Node.js LTS](https://nodejs.org/en/download) — choose the LTS version. Node.js includes `npm`, which installs the project's packages.
-3. [MySQL Community Server](https://dev.mysql.com/downloads/mysql/) — the database used by the application.
+3. [MySQL Community Server](https://dev.mysql.com/downloads/windows/installer/8.0.html) — the database used by the application.
 
 You may also install [MySQL Workbench](https://dev.mysql.com/downloads/workbench/) if you want a visual tool for viewing the database. It is optional.
 
